@@ -159,6 +159,52 @@ The Nextcloud service uses a full custom stack (not Nextcloud AIO):
 - MariaDB 11.8 for database
 - Redis 7.2 for caching and performance optimization
 
+The Nextcloud container includes **ffmpeg** for video preview generation and supports the **Memories** app (photo management with timeline view).
+
+**Setup procedure:**
+
+1. **Deploy and access Nextcloud** (first time setup):
+ ```bash
+ cd ~/server/self-hosting/stacks/nextcloud
+ docker compose up -d
+ ```
+ Complete the initial Nextcloud setup via web interface.
+
+2. Install the Memories app (highly recommended, but optional):
+- Via Web UI: Nextcloud → Apps → Multimedia → Search "Memories" → Install
+- Via CLI:
+```bash
+docker exec nextcloud-app php occ app:install memories
+docker exec nextcloud-app php occ app:enable memories
+```
+
+3. Run the configuration script:
+```bash
+cd ~/server/self-hosting/stacks/nextcloud
+chmod +x setup-previews.sh
+./setup-previews.sh
+```
+
+3. What the script does:
+- Verifies ffmpeg and ffprobe are installed in the container
+- Enables preview generation for images, videos, and documents
+- Set ffmpeg and ffprobe path for memories app (if installed)
+- Sets video streaming to "Direct" mode (no transcoding) to save CPU resources in memories app (if installed)
+
+4. Configure Memories settings (Admin):
+- Go to: Settings → Administration → Memories → Video Streaming
+- Verify ffmpeg and ffprobe paths are correctly set
+- Choose transcoding preferences:
+    - Direct mode (default): No transcoding, streams original quality (recommended for Pi 5)
+  - Transcoding enabled: Lower quality but saves bandwidth (higher CPU usage)
+5. Generate the Memories index:
+```bash
+docker exec nextcloud-app php occ memories:index --user YOUR_NEXTCLOUD_USERNAME --force
+```
+
+Note: The default configuration uses "Direct" mode (no transcoding) to avoid CPU overhead on Raspberry Pi 5. Videos stream in original quality. You can change this in the Memories admin settings if needed.
+
+
 ### Quartz Wiki
 
 Quartz is included as a Git submodule pointing to the official https://github.com/jackyzha0/quartz repository.
