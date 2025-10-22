@@ -1,0 +1,24 @@
+# Official docker-compose.yaml from jesseduffield/lazydocker
+# Modified for ARM64 (Raspberry Pi 5) and custom data directory
+
+services:
+  lazydocker:
+    build:
+      context: https://github.com/jesseduffield/lazydocker.git
+      args:
+        BASE_IMAGE_BUILDER: arm64v8/golang
+        GOARCH: arm64
+        GOARM:
+    container_name: lazydocker
+    stdin_open: true
+    tty: true
+    restart: "no"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${USER_HOME}/server/docker-data/lazydocker:/.config/jesseduffield/lazydocker
+    networks:
+      - service-network
+
+networks:
+  service-network:
+    external: true

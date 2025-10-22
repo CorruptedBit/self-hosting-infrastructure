@@ -1,20 +1,183 @@
 # Self-Hosting Infrastructure
 
-Raspberry Pi 5 homelab with Docker + Portainer + Tailscale
+Raspberry Pi 5 homelab with Docker Compose + Tailscale VPN
+
+> **⚠️ Security Notice:** All services are accessible **only through Tailscale VPN**. No ports are exposed to the local network or internet. Direct LAN access is not available.
 
 ## Services
-- **Caddy**: HTTPS reverse proxy
-- **Flame**: A self-hosted startpage for your server's applications and bookmarks.
-- **Memos**: An open-source, self-hosted knowledge management and note-taking platform.
-- **Nextcloud**: A self-hosted productivity platform for file sharing and collaboration.
-- **Portainer**: Container management.
-- **Quartz4**: Personal wiki and digital garden.
+- **Caddy**: HTTPS reverse proxy with automatic TLS (Tailscale certificates)
+- **Flame**: Self-hosted startpage for server applications and bookmarks
+- **Memos**: Open-source knowledge management and note-taking platform
+- **Nextcloud**: Full stack with Nextcloud + Redis cache + MariaDB (not Nextcloud AIO)
+- **Portainer**: Container monitoring with web UI
+- **Lazydocker**: TUI for Docker container management and monitoring
+- **PsiTransfer**: Simple file sharing service
+- **Quartz v4**: Personal wiki and digital garden (static site generator)
 
 ## Stack
-- Raspberry Pi 5 (8GB)
+- Raspberry Pi 5 (8GB RAM)
 - Docker + Docker Compose
-- Tailscale VPN
-- 500GB SSD storage
+- Tailscale VPN for secure remote access
+- 1TB Nvme storage
 
-## Deploy
-All services are deployed by docker compose.
+## Security Architecture
+
+This setup follows a **zero-trust, VPN-only access** model:
+
+- ✅ All services are accessible **only via Tailscale VPN**
+- ✅ Caddy binds exclusively to the Tailscale IP address
+- ✅ No ports exposed to LAN or public internet
+- ✅ HTTPS with Tailscale-managed certificates
+- ✅ Each service runs on a dedicated port on the Tailscale interface
+
+**Access pattern:**
+User → Tailscale VPN → Caddy (Tailscale IP) → Docker services
+
+**Not possible:**
+- ❌ Direct access from local LAN
+- ❌ Public internet access
+- ❌ Access without being connected to Tailscale
+
+## Directory Structure
+
+This repository should be cloned in `~/server/self-hosting/` on your server. The expected directory layout is:
+
+```
+~/server/
+├── docker-data/           # Persistent data for all containers
+│   ├── caddy/
+│   ├── certs/             # Tailscale TLS certificates
+│   ├── flame/
+│   ├── lazydocker/
+│   ├── memos/
+│   ├── nextcloud/
+│   ├── portainer/
+│   ├── psitransfer/
+│   └── quartz/            # Wiki content (folders and .md files)  goes here
+└── self-hosting/          # This repository
+  ├── .gitignore
+  ├── README.md
+  └── stacks/
+      ├── caddy/
+      ├── flame/
+      ├── lazydocker/
+      ├── memos/
+      ├── nextcloud/
+      ├── portainer/
+      ├── psitransfer/
+      └── quartz-wiki/
+
+```
+
+## Setup
+
+### Prerequisites
+
+1. **Tailscale installed and configured** on the Raspberry Pi
+```bash
+curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up
+```
+
+2. Get your Tailscale configuration:
+```bash
+# Get your Tailscale domain
+tailscale status
+# Get your Tailscale IP
+tailscale ip -4
+```
+
+3. Generate Tailscale TLS certificates (for Caddy HTTPS)
+- Follow Tailscale's guide for certificate generation
+- Certificates should be placed in ~/server/docker-data/certs/
+
+### Installation
+
+```bash
+# Clone the repository with submodules:
+git clone --recursive https://github.com/CorruptedBit/self-hosting-infrastructure.git ~/server/self-hosting
+
+# Or if already cloned without --recursive:
+cd ~/server/self-hosting
+git submodule init
+git submodule update
+
+# Create the data directories:
+mkdir -p ~/server/docker-data/{caddy,certs,flame,lazydocker,memos,nextcloud,portainer,psitransfer,quartz}
+
+# Configure environment variables:
+- Copy each .env.example to .env in the respective stack directory
+- Edit each .env file with your actual configuration (Tailscale domain, IP, paths, passwords)
+```
+
+#### Example for Caddy:
+```bash
+cd ~/server/self-hosting/stacks/caddy
+cp .env.example .env
+nano .env  # Edit with your Tailscale details
+```
+
+### Create the Docker network:
+```bash
+docker network create service-network
+```
+
+## Deploy services:
+```bash
+cd ~/server/self-hosting/stacks/<service-name>
+docker compose up -d
+```
+
+### Recommended order:
+1. Caddy (reverse proxy)
+2. Other services (flame, memos, nextcloud, etc.)
+
+## Management
+
+All services are managed via Docker Compose. Each service has its own compose.yaml file in its respective directory under stacks/.
+
+### Container Monitoring
+
+Lazydocker (CLI/TUI monitoring):
+```bash
+cd ~/server/self-hosting/stacks/lazydocker
+docker compose run --rm lazydocker
+
+# Or use the provided script (requires chmod +x first):
+./start-lazydocker.sh
+```
+
+Portainer (for web UI monitoring):
+- Access via https://your-hostname.tailnetXXXXXX.ts.net:9443 when connected to Tailscale
+
+## Technical Notes
+
+### Nextcloud Stack
+
+The Nextcloud service uses a full custom stack (not Nextcloud AIO):
+- Nextcloud container (custom build with ffmpeg for video previews)
+- MariaDB 11.8 for database
+- Redis 7.2 for caching and performance optimization
+
+### Quartz Wiki
+
+Quartz is included as a Git submodule pointing to the official https://github.com/jackyzha0/quartz repository.
+
+- The upstream Dockerfile runs Quartz in --serve mode (hot reload, ~350MB RAM)
+- This is overridden in compose.yaml to use static mode with http-server (~50MB RAM)
+- Static mode rebuilds the site once at startup and serves static files
+- This significantly reduces memory and CPU usage (but you have to restart your stack to update the website for new entries)
+
+To use the default serve mode (hot reload), comment out the custom command in stacks/quartz-wiki/compose.yaml.
+
+
+### Once connected to Tailscale, access services via the following ports:
+**These are default values. You may want to change them in `~/server/self-hosting/stacks/caddy/Caddyfile` and `~/server/self-hosting/stacks/caddy/compose.yaml`
+
+- https://your-hostname.tailnetXXXXXX.ts.net:9443 - Portainer
+- https://your-hostname.tailnetXXXXXX.ts.net:8080 - Nextcloud
+- https://your-hostname.tailnetXXXXXX.ts.net:5005 - Flame
+- https://your-hostname.tailnetXXXXXX.ts.net:5230 - Memos
+- https://your-hostname.tailnetXXXXXX.ts.net:8081 - Quartz Wiki
+- https://your-hostname.tailnetXXXXXX.ts.net:3000 - PsiTransfer
+
