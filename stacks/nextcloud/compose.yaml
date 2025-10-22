@@ -1,0 +1,80 @@
+services:
+  # ---------------------------------------------
+  # 1. DATABASE (MariaDB - Optimized for performance)
+  # ---------------------------------------------
+  nextcloud-db:
+    image: mariadb:11.8.3 # Using a specific, stable version of MariaDB
+    container_name: nextcloud-db
+    restart: unless-stopped # Best practice restart policy
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    volumes:
+      # Persistent database data on the SSD
+      - ${USER_HOME}/server/docker-data/nextcloud/mysql:/var/lib/mysql 
+    environment:
+      # Environment variables will be injected by Portainer interface
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD} 
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD} 
+    networks:
+      - service-network
+
+  # ---------------------------------------------
+  # 2. HIGH-SPEED CACHE (Redis - Essential for Nextcloud speed on Pi)
+  # ---------------------------------------------
+  redis:
+    image: redis:7.2-alpine
+    container_name: nextcloud-redis
+    restart: unless-stopped
+    networks:
+      - service-network
+
+  # ---------------------------------------------
+  # 3. NEXTCLOUD CORE (The main PHP application)
+  # ---------------------------------------------
+  nextcloud:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nextcloud-custom:latest
+    container_name: nextcloud-app
+    restart: unless-stopped
+    
+    volumes:
+      # App configuration and core files
+      - ${USER_HOME}/server/docker-data/nextcloud/html:/var/www/html
+      # User data folder (where files are stored)
+      - ${USER_HOME}/server/docker-data/nextcloud/data:/var/www/html/data
+      # Configuration files (config.php)
+      - ${USER_HOME}/server/docker-data/nextcloud/config:/var/www/html/config
+      # Custom apps directory
+      - ${USER_HOME}/server/docker-data/nextcloud/apps:/var/www/html/custom_apps 
+
+    environment:
+      # Database connection settings (using the same variables)
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD} 
+      MYSQL_HOST: nextcloud-db # Service name of the DB container
+      
+      # Reverse Proxy (Caddy/Tailscale) Configuration
+      OVERWRITEPROTOCOL: ${NC_OVERWRITE_PROTOCOL}
+      # The FQDN and port used to access Nextcloud externally via Caddy
+      OVERWRITEHOST: ${NC_OVERWRITE_HOST} 
+      OVERWRITECLIURL: https://${NC_OVERWRITE_HOST}
+      
+      # Tells Nextcloud to trust requests coming from the Docker network bridge
+      TRUSTED_PROXIES: ${NC_TRUSTED_PROXIES}
+      
+      # CACHE CONFIGURATION
+      REDIS_HOST: redis
+    
+    networks:
+      - service-network
+    depends_on:
+      - nextcloud-db
+      - redis # Ensure DB and Redis are ready before starting Nextcloud
+
+networks:
+  service-network:
+    external: true

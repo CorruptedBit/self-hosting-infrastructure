@@ -1,0 +1,15 @@
+# Secrets
+*.env
+!*.env.example
+secrets/
+*.key
+
+# Data
+data/
+*.log
+*.db
+*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,63 @@
+{
+	# Disable admin API
+	admin off
+}
+
+# Snippet TLS Tailscale
+(tailscale_tls) {
+	tls /certs/{$TAILSCALE_DOMAIN}.crt /certs/{$TAILSCALE_DOMAIN}.key
+}
+
+# Security headers
+(security_headers) {
+	header {
+		-Server
+		-X-Powered-By
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+}
+
+# Portainer
+https://{$TAILSCALE_DOMAIN}:9443 {
+	import tailscale_tls
+	import security_headers
+	reverse_proxy portainer:9000
+}
+
+# Nextcloud
+https://{$TAILSCALE_DOMAIN}:8080 {
+	import tailscale_tls
+	import security_headers
+	header Strict-Transport-Security "max-age=15552000;"
+	reverse_proxy nextcloud:80
+}
+
+# Flame
+https://{$TAILSCALE_DOMAIN}:5005 {
+	import tailscale_tls
+	import security_headers
+	reverse_proxy flame:5005
+}
+
+# Memos
+https://{$TAILSCALE_DOMAIN}:5230 {
+	import tailscale_tls
+	import security_headers
+	reverse_proxy memos:5230
+}
+
+# Quartz
+https://{$TAILSCALE_DOMAIN}:8081 {
+	import tailscale_tls
+	import security_headers
+	reverse_proxy quartz:8080
+}
+
+# PsiTransfer
+https://{$TAILSCALE_DOMAIN}:3000 {
+	import tailscale_tls
+	import security_headers
+	reverse_proxy psitransfer:3000
+}

@@ -1,0 +1,13 @@
+services:
+  memos:
+    image: neosmemo/memos:stable
+    container_name: memos
+    restart: unless-stopped
+    volumes:
+      - ${USER_HOME}/server/docker-data/memos:/var/opt/memos
+    networks:
+      - service-network
+
+networks:
+  service-network:
+    external: true

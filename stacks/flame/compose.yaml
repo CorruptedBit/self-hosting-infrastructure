@@ -1,0 +1,21 @@
+services:
+  flame:
+    image: pawelmalak/flame:multiarch 
+    container_name: flame
+    
+    volumes:
+      - ${USER_HOME}/server/docker-data/flame:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    # PORTS section is intentionally omitted: access is managed exclusively by Caddy.
+    environment:
+      # Password is read by .env file
+      - PASSWORD=${FLAME_PASSWORD}
+    restart: unless-stopped
+    networks:
+      # Connects Flame to the same network as Caddy, allowing Caddy to resolve 'flame'
+      - service-network
+
+# Defines the network that connects this service to the Caddy reverse proxy
+networks:
+  service-network:
+    external: true

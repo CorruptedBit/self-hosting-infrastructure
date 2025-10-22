@@ -1,0 +1,24 @@
+# This compose.yaml file is based on docker command at https://quartz.jzhao.xyz/features/Docker-Support.
+
+services:
+  quartz:
+    build:
+      context: ./quartz
+      dockerfile: Dockerfile
+    container_name: quartz-wiki
+    restart: unless-stopped
+    volumes:
+      - ${USER_HOME}/server/docker-data/quartz:/usr/src/app/content
+    networks:
+      - service-network
+    # Ports are managed by Caddy
+
+    # The following commmand sets Quartz to static mode (no hot reload, just ~50 Mb of RAM).
+    # The content in ${USER_HOME}/server/docker-data/quartz is loaded one time after docker compose ...
+    # Comment the following line to switch to "serve mode", the default mode for 
+    # this docker image (hot reload, ~350 Mb of RAM).
+    # Read the documentation at https://quartz.jzhao.xyz/build for more details on --serve mode.
+    command: sh -c "npm install -g http-server && npx quartz build && http-server public -p 8080 -c-1"
+networks:
+  service-network:
+    external: true
