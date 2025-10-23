@@ -22,7 +22,7 @@ Raspberry Pi 5 homelab with Docker Compose + Tailscale VPN
 
 ## Security Architecture
 
-This setup follows a **zero-trust, VPN-only access** model:
+This setup follows a **strict VPN-only access** model with network isolation:
 
 - ✅ All services are accessible **only via Tailscale VPN**
 - ✅ Caddy binds exclusively to the Tailscale IP address
