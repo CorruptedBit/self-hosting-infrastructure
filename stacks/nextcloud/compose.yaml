@@ -39,7 +39,11 @@ services:
     image: nextcloud-custom:latest
     container_name: nextcloud-app
     restart: unless-stopped
-    
+    labels:
+      - flame.type=application
+      - flame.name=Next Cloud
+      - flame.url=${TAILSCALE_HOST}:8080
+      - flame.icon=cloud
     volumes:
       # App configuration and core files
       - ${USER_HOME}/server/docker-data/nextcloud/html:/var/www/html

@@ -7,6 +7,11 @@ services:
       dockerfile: Dockerfile
     container_name: quartz-wiki
     restart: unless-stopped
+    labels:
+      - flame.type=application
+      - flame.name=Quartz
+      - flame.url=${TAILSCALE_HOST}:8081
+      - flame.icon=wikipedia
     volumes:
       - ${USER_HOME}/server/docker-data/quartz:/usr/src/app/content
     networks:

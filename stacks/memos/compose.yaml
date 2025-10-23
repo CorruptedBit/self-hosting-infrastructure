@@ -5,6 +5,11 @@ services:
     restart: unless-stopped
     volumes:
       - ${USER_HOME}/server/docker-data/memos:/var/opt/memos
+    labels:
+      - flame.type=application
+      - flame.name=Memos
+      - flame.url=${TAILSCALE_HOST}:5230
+      - flame.icon=pen    
     networks:
       - service-network
 

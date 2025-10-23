@@ -8,6 +8,11 @@ services:
       - ${USER_HOME}/docker-data/psitransfer:/data
     environment:
       PSITRANSFER_ADMIN_PASS: ${ADMIN_PASS}
+    labels:
+      - flame.type=application
+      - flame.name=PsiTransfer
+      - flame.url=${TAILSCALE_HOST}:3000
+      - flame.icon=transfer
     networks:
       - service-network
 

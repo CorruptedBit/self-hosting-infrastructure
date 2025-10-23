@@ -5,7 +5,11 @@ services:
     image: portainer/portainer-ce:latest
     container_name: portainer
     restart: unless-stopped
-
+    labels:
+      - flame.type=application
+      - flame.name=Portainer
+      - flame.url=${TAILSCALE_HOST}:9443
+      - flame.icon=crane
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ${USER_HOME}/server/docker-data/portainer:/data

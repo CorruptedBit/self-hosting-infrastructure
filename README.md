@@ -217,13 +217,31 @@ Quartz is included as a Git submodule pointing to the official https://github.co
 To use the default serve mode (hot reload), comment out the custom command in stacks/quartz-wiki/compose.yaml.
 
 
-### Once connected to Tailscale, access services via the following ports:
-**These are default values. You may want to change them in `~/server/self-hosting/stacks/caddy/Caddyfile` and `~/server/self-hosting/stacks/caddy/compose.yaml`
+## Service Access and Dashboard
 
-- https://your-hostname.tailnetXXXXXX.ts.net:9443 - Portainer
-- https://your-hostname.tailnetXXXXXX.ts.net:8080 - Nextcloud
-- https://your-hostname.tailnetXXXXXX.ts.net:5005 - Flame
-- https://your-hostname.tailnetXXXXXX.ts.net:5230 - Memos
-- https://your-hostname.tailnetXXXXXX.ts.net:8081 - Quartz Wiki
-- https://your-hostname.tailnetXXXXXX.ts.net:3000 - PsiTransfer
+### Direct Access (Via Tailscale)
 
+Once connected to your **Tailscale VPN**, you can directly access each service using your Tailscale hostname and the respective port.
+
+> **Note:** The port values below are defaults. You might have changed them in your **Caddy** configuration file (`~/server/self-hosting/stacks/caddy/Caddyfile`).
+
+| Service | Access URL | Port |
+| :--- | :--- | :--- |
+| **Portainer** | `https://your-hostname.tailnetXXXXXX.ts.net:9443` | 9443 |
+| **Nextcloud** | `https://your-hostname.tailnetXXXXXX.ts.net:8080` | 8080 |
+| **Flame** | `https://your-hostname.tailnetXXXXXX.ts.net:5005` | 5005 |
+| **Memos** | `https://your-hostname.tailnetXXXXXX.ts.net:5230` | 5230 |
+| **Quartz Wiki** | `https://your-hostname.tailnetXXXXXX.ts.net:8081` | 8081 |
+| **PsiTransfer** | `https://your-hostname.tailnetXXXXXX.ts.net:3000` | 3000 |
+
+---
+
+### Centralized Dashboard (Flame)
+
+You can use **Flame** (`https://your-hostname.tailnetXXXXXX.ts.net:5005`) as your primary **static home page** to quickly access all your self-hosted applications and bookmarks.
+
+**Docker Integration:**
+The **Flame Docker integration** is enabled, allowing for automatic discovery and listing of services on the dashboard.
+
+* **How it works:** Necessary `flame.*` **labels** have been added to the `docker-compose.yaml` file of each service intended to be exposed (e.g., `nextcloud-app`, `memos`).
+* **Excluded Services:** Internal services, such as databases (e.g., `nextcloud-db`), are intentionally excluded as they do not require dashboard access. 
