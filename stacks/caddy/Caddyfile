@@ -61,3 +61,10 @@ https://{$TAILSCALE_DOMAIN}:3000 {
 	import security_headers
 	reverse_proxy psitransfer:3000
 }
+
+# Ntfy
+https://{$TAILSCALE_DOMAIN}:8888 {
+	import tailscale_tls
+	import security_headers
+	reverse_proxy ntfy:80
+}

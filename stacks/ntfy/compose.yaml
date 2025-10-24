@@ -1,0 +1,24 @@
+services:
+  ntfy:
+    image: binwiederhier/ntfy
+    container_name: ntfy
+    command:
+      - serve
+    environment:
+      - TZ=Europe/Rome
+    volumes:
+      - ${USER_HOME}/server/docker-data/ntfy/cache:/var/cache/ntfy
+      - ${USER_HOME}/server/docker-data/ntfy/etc:/etc/ntfy
+    labels:
+      - flame.type=application
+      - flame.name=ntfy
+      - flame.url=${TAILSCALE_HOST}:8888
+      - flame.icon=bell
+    restart: unless-stopped
+    init: true
+    networks:
+      - service-network
+
+networks:
+  service-network:
+    external: true
