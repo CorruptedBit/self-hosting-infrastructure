@@ -9,6 +9,7 @@ Raspberry Pi 5 homelab with Docker Compose + Tailscale VPN
 - **Flame**: Self-hosted startpage for server applications and bookmarks
 - **Memos**: Open-source knowledge management and note-taking platform
 - **Nextcloud**: Full stack with Nextcloud + Redis cache + MariaDB (not Nextcloud AIO)
+- **Ntfy**: Push notification service for server alerts and monitoring
 - **Portainer**: Container monitoring with web UI
 - **Lazydocker**: TUI for Docker container management and monitoring
 - **PsiTransfer**: Simple file sharing service
@@ -51,6 +52,7 @@ This repository should be cloned in `~/server/self-hosting/` on your server. The
 │   ├── lazydocker/
 │   ├── memos/
 │   ├── nextcloud/
+│   ├── ntfy/
 │   ├── portainer/
 │   ├── psitransfer/
 │   └── quartz/            # Wiki content (folders and .md files)  goes here
@@ -63,6 +65,7 @@ This repository should be cloned in `~/server/self-hosting/` on your server. The
       ├── lazydocker/
       ├── memos/
       ├── nextcloud/
+      ├── ntfy/
       ├── portainer/
       ├── psitransfer/
       └── quartz-wiki/
@@ -103,7 +106,7 @@ git submodule init
 git submodule update
 
 # Create the data directories:
-mkdir -p ~/server/docker-data/{caddy,certs,flame,lazydocker,memos,nextcloud,portainer,psitransfer,quartz}
+mkdir -p ~/server/docker-data/{caddy,certs,flame,lazydocker,memos,nextcloud,ntfy,portainer,psitransfer,quartz}
 
 # Configure environment variables:
 - Copy each .env.example to .env in the respective stack directory
@@ -231,6 +234,7 @@ Once connected to your **Tailscale VPN**, you can directly access each service u
 | **Nextcloud** | `https://your-hostname.tailnetXXXXXX.ts.net:8080` | 8080 |
 | **Flame** | `https://your-hostname.tailnetXXXXXX.ts.net:5005` | 5005 |
 | **Memos** | `https://your-hostname.tailnetXXXXXX.ts.net:5230` | 5230 |
+| **Ntfy** | `https://your-hostname.tailnetXXXXXX.ts.net:8888` | 8888 |
 | **Quartz Wiki** | `https://your-hostname.tailnetXXXXXX.ts.net:8081` | 8081 |
 | **PsiTransfer** | `https://your-hostname.tailnetXXXXXX.ts.net:3000` | 3000 |
 
