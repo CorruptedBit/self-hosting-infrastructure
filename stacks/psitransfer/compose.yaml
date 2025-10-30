@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     # Port 3000 is managed internally by Caddy 
     volumes:
-      - ${USER_HOME}/docker-data/psitransfer:/data
+      - ${USER_HOME}/server/docker-data/psitransfer:/data
     environment:
       PSITRANSFER_ADMIN_PASS: ${ADMIN_PASS}
     labels:
