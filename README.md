@@ -9,6 +9,7 @@ Raspberry Pi 5 homelab with Docker Compose + Tailscale VPN
 - **Flame**: Self-hosted startpage for server applications and bookmarks
 - **Immich**: Self-hosted photo and video backup solution (Google Photos alternative)
 - **Lazydocker**: TUI for Docker container management and monitoring
+- **Linkding**: Bookmark manager with tagging, archiving, and browser extensions
 - **Memos**: Open-source knowledge management and note-taking platform
 - **Nextcloud**: Full stack with Nextcloud + Redis cache + MariaDB (not Nextcloud AIO)
 - **Ntfy**: Push notification service for server alerts and monitoring
@@ -52,6 +53,7 @@ This repository should be cloned in `~/server/self-hosting/` on your server. The
 │   ├── flame/
 │   ├── immich/
 │   ├── lazydocker/
+│   ├── linkding/
 │   ├── memos/
 │   ├── nextcloud/
 │   ├── ntfy/
@@ -66,6 +68,7 @@ This repository should be cloned in `~/server/self-hosting/` on your server. The
         ├── flame/
         ├── immich/
         ├── lazydocker/
+        ├── linkding/
         ├── memos/
         ├── nextcloud/
         ├── ntfy/
@@ -108,7 +111,7 @@ git submodule init
 git submodule update
 
 # Create the data directories:
-mkdir -p ~/server/docker-data/{caddy,certs,flame,lazydocker,memos,nextcloud,ntfy,portainer,psitransfer,quartz}
+mkdir -p ~/server/docker-data/{caddy,certs,flame,lazydocker,linkding,memos,nextcloud,ntfy,portainer,psitransfer,quartz}
 mkdir -p ~/server/docker-data/immich/{library,model-cache,postgresql}
 
 # Configure environment variables:
@@ -235,6 +238,7 @@ Once connected to your **Tailscale VPN**, you can directly access each service u
 | **Portainer** | `https://your-hostname.tailnetXXXXXX.ts.net:9443` | 9443 |
 | **Nextcloud** | `https://your-hostname.tailnetXXXXXX.ts.net:8080` | 8080 |
 | **Immich** | `https://your-hostname.tailnetXXXXXX.ts.net:2283` | 2283 |
+| **Linkding** | `https://your-hostname.tailnetXXXXXX.ts.net:9090` | 9090 |
 | **Flame** | `https://your-hostname.tailnetXXXXXX.ts.net:5005` | 5005 |
 | **Memos** | `https://your-hostname.tailnetXXXXXX.ts.net:5230` | 5230 |
 | **Ntfy** | `https://your-hostname.tailnetXXXXXX.ts.net:8888` | 8888 |
@@ -250,5 +254,5 @@ You can use **Flame** (`https://your-hostname.tailnetXXXXXX.ts.net:5005`) as you
 **Docker Integration:**
 The **Flame Docker integration** is enabled, allowing for automatic discovery and listing of services on the dashboard.
 
-- **How it works:** Necessary `flame.*` labels have been added to the `compose.yaml` file of each service intended to be exposed (e.g., `nextcloud-app`, `immich-server`, `memos`).
+- **How it works:** Necessary `flame.*` labels have been added to the `compose.yaml` file of each service intended to be exposed (e.g., `nextcloud-app`, `immich-server`, `linkding`, `memos`).
 - **Excluded Services:** Internal services, such as databases (e.g., `nextcloud-db`, `immich_postgres`) and caches (e.g., `immich_redis`), are intentionally excluded as they do not require dashboard access.
