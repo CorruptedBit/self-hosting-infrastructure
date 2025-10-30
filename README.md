@@ -7,11 +7,12 @@ Raspberry Pi 5 homelab with Docker Compose + Tailscale VPN
 ## Services
 - **Caddy**: HTTPS reverse proxy with automatic TLS (Tailscale certificates)
 - **Flame**: Self-hosted startpage for server applications and bookmarks
+- **Immich**: Self-hosted photo and video backup solution (Google Photos alternative)
+- **Lazydocker**: TUI for Docker container management and monitoring
 - **Memos**: Open-source knowledge management and note-taking platform
 - **Nextcloud**: Full stack with Nextcloud + Redis cache + MariaDB (not Nextcloud AIO)
 - **Ntfy**: Push notification service for server alerts and monitoring
 - **Portainer**: Container monitoring with web UI
-- **Lazydocker**: TUI for Docker container management and monitoring
 - **PsiTransfer**: Simple file sharing service
 - **Quartz v4**: Personal wiki and digital garden (static site generator)
 
@@ -19,7 +20,7 @@ Raspberry Pi 5 homelab with Docker Compose + Tailscale VPN
 - Raspberry Pi 5 (8GB RAM)
 - Docker + Docker Compose
 - Tailscale VPN for secure remote access
-- 1TB Nvme storage
+- 1TB NVMe storage
 
 ## Security Architecture
 
@@ -49,27 +50,28 @@ This repository should be cloned in `~/server/self-hosting/` on your server. The
 │   ├── caddy/
 │   ├── certs/             # Tailscale TLS certificates
 │   ├── flame/
+│   ├── immich/
 │   ├── lazydocker/
 │   ├── memos/
 │   ├── nextcloud/
 │   ├── ntfy/
 │   ├── portainer/
 │   ├── psitransfer/
-│   └── quartz/            # Wiki content (folders and .md files)  goes here
+│   └── quartz/            # Wiki content (folders and .md files) goes here
 └── self-hosting/          # This repository
-  ├── .gitignore
-  ├── README.md
-  └── stacks/
-      ├── caddy/
-      ├── flame/
-      ├── lazydocker/
-      ├── memos/
-      ├── nextcloud/
-      ├── ntfy/
-      ├── portainer/
-      ├── psitransfer/
-      └── quartz-wiki/
-
+    ├── .gitignore
+    ├── README.md
+    └── stacks/
+        ├── caddy/
+        ├── flame/
+        ├── immich/
+        ├── lazydocker/
+        ├── memos/
+        ├── nextcloud/
+        ├── ntfy/
+        ├── portainer/
+        ├── psitransfer/
+        └── quartz-wiki/
 ```
 
 ## Setup
@@ -92,7 +94,7 @@ tailscale ip -4
 
 3. Generate Tailscale TLS certificates (for Caddy HTTPS)
 - Follow Tailscale's guide for certificate generation
-- Certificates should be placed in ~/server/docker-data/certs/
+- Certificates should be placed in `~/server/docker-data/certs/`
 
 ### Installation
 
@@ -107,10 +109,11 @@ git submodule update
 
 # Create the data directories:
 mkdir -p ~/server/docker-data/{caddy,certs,flame,lazydocker,memos,nextcloud,ntfy,portainer,psitransfer,quartz}
+mkdir -p ~/server/docker-data/immich/{library,model-cache,postgresql}
 
 # Configure environment variables:
-- Copy each .env.example to .env in the respective stack directory
-- Edit each .env file with your actual configuration (Tailscale domain, IP, paths, passwords)
+# - Copy each .env.example to .env in the respective stack directory
+# - Edit each .env file with your actual configuration (Tailscale domain, IP, paths, passwords)
 ```
 
 #### Example for Caddy:
@@ -133,15 +136,15 @@ docker compose up -d
 
 ### Recommended order:
 1. Caddy (reverse proxy)
-2. Other services (flame, memos, nextcloud, etc.)
+2. Other services (flame, immich, memos, nextcloud, etc.)
 
 ## Management
 
-All services are managed via Docker Compose. Each service has its own compose.yaml file in its respective directory under stacks/.
+All services are managed via Docker Compose. Each service has its own compose.yaml file in its respective directory under `stacks/`.
 
 ### Container Monitoring
 
-Lazydocker (CLI/TUI monitoring):
+**Lazydocker** (CLI/TUI monitoring):
 ```bash
 cd ~/server/self-hosting/stacks/lazydocker
 docker compose run --rm lazydocker
@@ -150,8 +153,8 @@ docker compose run --rm lazydocker
 ./start-lazydocker.sh
 ```
 
-Portainer (for web UI monitoring):
-- Access via https://your-hostname.tailnetXXXXXX.ts.net:9443 when connected to Tailscale
+**Portainer** (for web UI monitoring):
+- Access via `https://your-hostname.tailnetXXXXXX.ts.net:9443` when connected to Tailscale
 
 ## Technical Notes
 
@@ -167,11 +170,11 @@ The Nextcloud container includes **ffmpeg** for video preview generation and sup
 **Setup procedure:**
 
 1. **Deploy and access Nextcloud** (first time setup):
- ```bash
- cd ~/server/self-hosting/stacks/nextcloud
- docker compose up -d
- ```
- Complete the initial Nextcloud setup via web interface.
+```bash
+cd ~/server/self-hosting/stacks/nextcloud
+docker compose up -d
+```
+Complete the initial Nextcloud setup via web interface.
 
 2. Install the Memories app (highly recommended, but optional):
 - Via Web UI: Nextcloud → Apps → Multimedia → Search "Memories" → Install
@@ -188,37 +191,36 @@ chmod +x setup-previews.sh
 ./setup-previews.sh
 ```
 
-3. What the script does:
+4. What the script does:
 - Verifies ffmpeg and ffprobe are installed in the container
 - Enables preview generation for images, videos, and documents
-- Set ffmpeg and ffprobe path for memories app (if installed)
-- Sets video streaming to "Direct" mode (no transcoding) to save CPU resources in memories app (if installed)
+- Sets ffmpeg and ffprobe path for Memories app (if installed)
+- Sets video streaming to "Direct" mode (no transcoding) to save CPU resources in Memories app (if installed)
 
-4. Configure Memories settings (Admin):
+5. Configure Memories settings (Admin):
 - Go to: Settings → Administration → Memories → Video Streaming
 - Verify ffmpeg and ffprobe paths are correctly set
 - Choose transcoding preferences:
-    - Direct mode (default): No transcoding, streams original quality (recommended for Pi 5)
+  - Direct mode (default): No transcoding, streams original quality (recommended for Pi 5)
   - Transcoding enabled: Lower quality but saves bandwidth (higher CPU usage)
-5. Generate the Memories index:
+
+6. Generate the Memories index:
 ```bash
 docker exec nextcloud-app php occ memories:index --user YOUR_NEXTCLOUD_USERNAME --force
 ```
 
-Note: The default configuration uses "Direct" mode (no transcoding) to avoid CPU overhead on Raspberry Pi 5. Videos stream in original quality. You can change this in the Memories admin settings if needed.
-
+**Note:** The default configuration uses "Direct" mode (no transcoding) to avoid CPU overhead on Raspberry Pi 5. Videos stream in original quality. You can change this in the Memories admin settings if needed.
 
 ### Quartz Wiki
 
 Quartz is included as a Git submodule pointing to the official https://github.com/jackyzha0/quartz repository.
 
-- The upstream Dockerfile runs Quartz in --serve mode (hot reload, ~350MB RAM)
+- The upstream Dockerfile runs Quartz in `--serve` mode (hot reload, ~350MB RAM)
 - This is overridden in compose.yaml to use static mode with http-server (~50MB RAM)
 - Static mode rebuilds the site once at startup and serves static files
 - This significantly reduces memory and CPU usage (but you have to restart your stack to update the website for new entries)
 
-To use the default serve mode (hot reload), comment out the custom command in stacks/quartz-wiki/compose.yaml.
-
+To use the default serve mode (hot reload), comment out the custom command in `stacks/quartz-wiki/compose.yaml`.
 
 ## Service Access and Dashboard
 
@@ -232,6 +234,7 @@ Once connected to your **Tailscale VPN**, you can directly access each service u
 | :--- | :--- | :--- |
 | **Portainer** | `https://your-hostname.tailnetXXXXXX.ts.net:9443` | 9443 |
 | **Nextcloud** | `https://your-hostname.tailnetXXXXXX.ts.net:8080` | 8080 |
+| **Immich** | `https://your-hostname.tailnetXXXXXX.ts.net:2283` | 2283 |
 | **Flame** | `https://your-hostname.tailnetXXXXXX.ts.net:5005` | 5005 |
 | **Memos** | `https://your-hostname.tailnetXXXXXX.ts.net:5230` | 5230 |
 | **Ntfy** | `https://your-hostname.tailnetXXXXXX.ts.net:8888` | 8888 |
@@ -247,5 +250,5 @@ You can use **Flame** (`https://your-hostname.tailnetXXXXXX.ts.net:5005`) as you
 **Docker Integration:**
 The **Flame Docker integration** is enabled, allowing for automatic discovery and listing of services on the dashboard.
 
-* **How it works:** Necessary `flame.*` **labels** have been added to the `docker-compose.yaml` file of each service intended to be exposed (e.g., `nextcloud-app`, `memos`).
-* **Excluded Services:** Internal services, such as databases (e.g., `nextcloud-db`), are intentionally excluded as they do not require dashboard access. 
+- **How it works:** Necessary `flame.*` labels have been added to the `compose.yaml` file of each service intended to be exposed (e.g., `nextcloud-app`, `immich-server`, `memos`).
+- **Excluded Services:** Internal services, such as databases (e.g., `nextcloud-db`, `immich_postgres`) and caches (e.g., `immich_redis`), are intentionally excluded as they do not require dashboard access.
