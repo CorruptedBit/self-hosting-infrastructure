@@ -1,0 +1,20 @@
+services:
+  linkding:
+    container_name: "${LD_CONTAINER_NAME:-linkding}"
+    image: sissbruecker/linkding:latest
+    volumes:
+      - "${USER_HOME}/server/docker-data/linkding:/etc/linkding/data"
+    env_file:
+      - .env
+    labels:
+      - flame.type=application
+      - flame.name=Linkding
+      - flame.url=${TAILSCALE_HOST}:9090
+      - flame.icon=bookmark
+    restart: unless-stopped
+    networks:
+      - service-network
+
+networks:
+  service-network:
+    external: true

@@ -12,6 +12,7 @@ services:
       - "${RPI_TAILSCALE_IP}:3000:3000" #PsiTransfer
       - "${RPI_TAILSCALE_IP}:8888:8888" #Ntfy
       - "${RPI_TAILSCALE_IP}:2283:2283" #Immich
+      - "${RPI_TAILSCALE_IP}:9090:9090" #Linkding
     volumes:
       - ${USER_HOME}/server/self-hosting/stacks/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - ${USER_HOME}/server/docker-data/caddy/config:/config

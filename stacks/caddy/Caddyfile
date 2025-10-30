@@ -76,3 +76,10 @@ https://{$TAILSCALE_DOMAIN}:2283 {
 	reverse_proxy immich_server:2283
 }
 
+# Linkding
+https://{$TAILSCALE_DOMAIN}:9090 {
+	import tailscale_tls
+	import security_headers
+	reverse_proxy linkding:9090
+}
+
