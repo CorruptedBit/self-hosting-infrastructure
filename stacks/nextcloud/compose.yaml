@@ -17,7 +17,7 @@ services:
       MARIADB_USER: ${DB_USER}
       MARIADB_PASSWORD: ${DB_PASSWORD} 
     networks:
-      - service-network
+      - default
 
   # ---------------------------------------------
   # 2. HIGH-SPEED CACHE (Redis - Essential for Nextcloud speed on Pi)
@@ -27,7 +27,7 @@ services:
     container_name: nextcloud-redis
     restart: unless-stopped
     networks:
-      - service-network
+      - default
 
   # ---------------------------------------------
   # 3. NEXTCLOUD CORE (The main PHP application)
@@ -75,6 +75,7 @@ services:
     
     networks:
       - service-network
+      - default
     depends_on:
       - nextcloud-db
       - redis # Ensure DB and Redis are ready before starting Nextcloud
