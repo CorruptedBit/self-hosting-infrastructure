@@ -14,6 +14,7 @@ Raspberry Pi 5 homelab with Docker Compose + Tailscale VPN
 - **Nextcloud**: Full stack with Nextcloud + Redis cache + MariaDB (not Nextcloud AIO)
 - **Ntfy**: Push notification service for server alerts and monitoring
 - **Portainer**: Container monitoring with web UI
+- **Navidrome**: Open-source music server and streamer
 - **PsiTransfer**: Simple file sharing service
 - **Quartz v4**: Personal wiki and digital garden (static site generator)
 
@@ -55,6 +56,9 @@ This repository should be cloned in `~/server/self-hosting/` on your server. The
 │   ├── lazydocker/
 │   ├── linkding/
 │   ├── memos/
+│   ├── navidrome/
+|       ├── music/         # Music files go here
+|       ├── ...
 │   ├── nextcloud/
 │   ├── ntfy/
 │   ├── portainer/
@@ -70,6 +74,7 @@ This repository should be cloned in `~/server/self-hosting/` on your server. The
         ├── lazydocker/
         ├── linkding/
         ├── memos/
+        ├── navidrome/
         ├── nextcloud/
         ├── ntfy/
         ├── portainer/
@@ -243,6 +248,7 @@ Once connected to your **Tailscale VPN**, you can directly access each service u
 | **Memos** | `https://your-hostname.tailnetXXXXXX.ts.net:5230` | 5230 |
 | **Ntfy** | `https://your-hostname.tailnetXXXXXX.ts.net:8888` | 8888 |
 | **Quartz Wiki** | `https://your-hostname.tailnetXXXXXX.ts.net:8081` | 8081 |
+| **Navidrome** | `https://your-hostname.tailnetXXXXXX.ts.net:4533` | 4533 |
 | **PsiTransfer** | `https://your-hostname.tailnetXXXXXX.ts.net:3000` | 3000 |
 
 ---
