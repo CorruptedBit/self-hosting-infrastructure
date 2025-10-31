@@ -83,3 +83,9 @@ https://{$TAILSCALE_DOMAIN}:9090 {
 	reverse_proxy linkding:9090
 }
 
+# Navidrome
+https://{$TAILSCALE_DOMAIN}:4533 {
+	import tailscale_tls
+	import security_headers
+	reverse_proxy navidrome:4533
+}

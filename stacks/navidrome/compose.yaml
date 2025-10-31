@@ -1,0 +1,27 @@
+services:
+  navidrome:
+    container_name: navidrome
+    image: deluan/navidrome:latest
+    restart: unless-stopped
+    user: 1000:1000
+    environment:
+      - ND_LOGLEVEL=info
+      - ND_SCANSCHEDULE=@every 1h
+      - ND_SESSIONTIMEOUT=24h
+      - ND_TRANSCODINGCACHESIZE=100MB
+      - ND_IMAGECACHESIZE=100MB
+      - ND_DEFAULTLANGUAGE=it
+    labels:
+      - flame.type=application
+      - flame.name=Navidrome
+      - flame.url=${TAILSCALE_HOST}:4533
+      - flame.icon=music
+    volumes:
+      - "${USER_HOME}/server/docker-data/navidrome/data:/data"
+      - "${USER_HOME}/server/docker-data/navidrome/music:/music:ro"
+    networks:
+      - service-network
+
+networks:
+  service-network:
+    external: true
