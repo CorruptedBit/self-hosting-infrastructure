@@ -17,8 +17,8 @@ services:
       - flame.url=${TAILSCALE_HOST}:4533
       - flame.icon=music
     volumes:
-      - "${USER_HOME}/server/docker-data/navidrome/data:/data"
-      - "${USER_HOME}/server/docker-data/navidrome/music:/music:ro"
+      - "${SERVER_ROOT}/docker-data/navidrome/data:/data"
+      - "${SERVER_ROOT}/docker-data/navidrome/music:/music:ro"
     networks:
       - service-network
 

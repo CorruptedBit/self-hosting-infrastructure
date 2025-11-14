@@ -4,7 +4,7 @@ services:
     container_name: memos
     restart: unless-stopped
     volumes:
-      - ${USER_HOME}/server/docker-data/memos:/var/opt/memos
+      - ${SERVER_ROOT}/docker-data/memos:/var/opt/memos
     labels:
       - flame.type=application
       - flame.name=Memos

@@ -12,8 +12,6 @@ Raspberry Pi 5 homelab with Docker Compose + Tailscale VPN
 - **Linkding**: Bookmark manager with tagging, archiving, and browser extensions
 - **Memos**: Open-source knowledge management and note-taking platform
 - **Nextcloud**: Full stack with Nextcloud + Redis cache + MariaDB (not Nextcloud AIO)
-- **Ntfy**: Push notification service for server alerts and monitoring
-- **Portainer**: Container monitoring with web UI
 - **Navidrome**: Open-source music server and streamer
 - **PsiTransfer**: Simple file sharing service
 - **Quartz v4**: Personal wiki and digital garden (static site generator)
@@ -60,8 +58,6 @@ This repository should be cloned in `~/server/self-hosting/` on your server. The
 |       ├── music/         # Music files go here
 |       ├── ...
 │   ├── nextcloud/
-│   ├── ntfy/
-│   ├── portainer/
 │   ├── psitransfer/
 │   └── quartz/            # Wiki content (folders and .md files) goes here
 └── self-hosting/          # This repository
@@ -76,8 +72,6 @@ This repository should be cloned in `~/server/self-hosting/` on your server. The
         ├── memos/
         ├── navidrome/
         ├── nextcloud/
-        ├── ntfy/
-        ├── portainer/
         ├── psitransfer/
         └── quartz-wiki/
 ```
@@ -116,8 +110,7 @@ git submodule init
 git submodule update
 
 # Create the data directories:
-mkdir -p ~/server/docker-data/{caddy,certs,flame,lazydocker,linkding,memos,nextcloud,ntfy,portainer,psitransfer,quartz}
-mkdir -p ~/server/docker-data/immich/{library,model-cache,postgresql}
+mkdir -p ~/server/docker-data/{caddy,certs,flame,lazydocker,linkding,memos,navidrome,nextcloud,immich,psitransfer,quartz}
 
 # Configure environment variables:
 # - Copy each .env.example to .env in the respective stack directory
@@ -160,9 +153,6 @@ docker compose run --rm lazydocker
 # Or use the provided script (requires chmod +x first):
 ./start-lazydocker.sh
 ```
-
-**Portainer** (for web UI monitoring):
-- Access via `https://your-hostname.tailnetXXXXXX.ts.net:9443` when connected to Tailscale
 
 ## Technical Notes
 
@@ -240,13 +230,11 @@ Once connected to your **Tailscale VPN**, you can directly access each service u
 
 | Service | Access URL | Port |
 | :--- | :--- | :--- |
-| **Portainer** | `https://your-hostname.tailnetXXXXXX.ts.net:9443` | 9443 |
 | **Nextcloud** | `https://your-hostname.tailnetXXXXXX.ts.net:8080` | 8080 |
 | **Immich** | `https://your-hostname.tailnetXXXXXX.ts.net:2283` | 2283 |
 | **Linkding** | `https://your-hostname.tailnetXXXXXX.ts.net:9090` | 9090 |
 | **Flame** | `https://your-hostname.tailnetXXXXXX.ts.net:5005` | 5005 |
 | **Memos** | `https://your-hostname.tailnetXXXXXX.ts.net:5230` | 5230 |
-| **Ntfy** | `https://your-hostname.tailnetXXXXXX.ts.net:8888` | 8888 |
 | **Quartz Wiki** | `https://your-hostname.tailnetXXXXXX.ts.net:8081` | 8081 |
 | **Navidrome** | `https://your-hostname.tailnetXXXXXX.ts.net:4533` | 4533 |
 | **PsiTransfer** | `https://your-hostname.tailnetXXXXXX.ts.net:3000` | 3000 |
@@ -262,3 +250,5 @@ The **Flame Docker integration** is enabled, allowing for automatic discovery an
 
 - **How it works:** Necessary `flame.*` labels have been added to the `compose.yaml` file of each service intended to be exposed (e.g., `nextcloud-app`, `immich-server`, `linkding`, `memos`).
 - **Excluded Services:** Internal services, such as databases (e.g., `nextcloud-db`, `immich_postgres`) and caches (e.g., `immich_redis`), are intentionally excluded as they do not require dashboard access.
+
+---

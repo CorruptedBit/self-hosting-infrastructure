@@ -15,10 +15,10 @@ services:
       - "${RPI_TAILSCALE_IP}:9090:9090" #Linkding
       - "${RPI_TAILSCALE_IP}:4533:4533" #Navidrome
     volumes:
-      - ${USER_HOME}/server/self-hosting/stacks/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-      - ${USER_HOME}/server/docker-data/caddy/config:/config
-      - ${USER_HOME}/server/docker-data/caddy/data:/data
-      - ${USER_HOME}/server/docker-data/certs:/certs:ro
+      - ${SERVER_ROOT}/self-hosting/stacks/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ${SERVER_ROOT}/docker-data/caddy/config:/config
+      - ${SERVER_ROOT}/docker-data/caddy/data:/data
+      - ${SERVER_ROOT}/docker-data/certs:/certs:ro
     environment:
       - TAILSCALE_DOMAIN=${TAILSCALE_DOMAIN}
     networks:

@@ -9,7 +9,7 @@ services:
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     volumes:
       # Persistent database data on the SSD
-      - ${USER_HOME}/server/docker-data/nextcloud/mysql:/var/lib/mysql 
+      - ${SERVER_ROOT}/docker-data/nextcloud/mysql:/var/lib/mysql 
     environment:
       # Environment variables will be injected by Portainer interface
       MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD} 
@@ -46,13 +46,13 @@ services:
       - flame.icon=cloud
     volumes:
       # App configuration and core files
-      - ${USER_HOME}/server/docker-data/nextcloud/html:/var/www/html
+      - ${SERVER_ROOT}/docker-data/nextcloud/html:/var/www/html
       # User data folder (where files are stored)
-      - ${USER_HOME}/server/docker-data/nextcloud/data:/var/www/html/data
+      - ${SERVER_ROOT}/docker-data/nextcloud/data:/var/www/html/data
       # Configuration files (config.php)
-      - ${USER_HOME}/server/docker-data/nextcloud/config:/var/www/html/config
+      - ${SERVER_ROOT}/docker-data/nextcloud/config:/var/www/html/config
       # Custom apps directory
-      - ${USER_HOME}/server/docker-data/nextcloud/apps:/var/www/html/custom_apps 
+      - ${SERVER_ROOT}/docker-data/nextcloud/apps:/var/www/html/custom_apps 
 
     environment:
       # Database connection settings (using the same variables)

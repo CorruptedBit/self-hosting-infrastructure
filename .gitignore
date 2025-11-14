@@ -13,3 +13,7 @@ data/
 # OS
 .DS_Store
 Thumbs.db
+
+# Autorestic
+# Autorestic lock files
+.autorestic.lock.yml

@@ -3,9 +3,7 @@ services:
     container_name: "${LD_CONTAINER_NAME:-linkding}"
     image: sissbruecker/linkding:latest
     volumes:
-      - "${USER_HOME}/server/docker-data/linkding:/etc/linkding/data"
-    env_file:
-      - .env
+      - "${SERVER_ROOT}/docker-data/linkding:/etc/linkding/data"
     labels:
       - flame.type=application
       - flame.name=Linkding

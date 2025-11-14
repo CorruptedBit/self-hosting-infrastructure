@@ -15,7 +15,7 @@ services:
     restart: "no"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ${USER_HOME}/server/docker-data/lazydocker:/.config/jesseduffield/lazydocker
+      - ${SERVER_ROOT}/docker-data/lazydocker:/.config/jesseduffield/lazydocker
     networks:
       - service-network
 
